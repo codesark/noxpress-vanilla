@@ -1,3 +1,5 @@
+import config from './core/config';
+
 import express from 'express';
 import path from 'path';
 import cors from 'cors';
@@ -7,32 +9,53 @@ import helmet from 'helmet';
 import logger from './core/logger';
 import router from './core/router';
 
-const PORT: number = parseInt(process.env.PORT || '3000');
+console.log('⚡️[server]: Setting Up...')
+if(config.NODE_ENV == 'development') console.log('⚡️[server]: config ', config);
+
 const app: express.Application = express();
 
-app.use(cors());
-app.use(helmet())
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+async function main() {
 
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
+    // connect mongoose to database
+    // await mongoose.connect(config.MONGODB_URL, { 
+    //     useNewUrlParser: true, 
+    //     useUnifiedTopology: true, 
+    //     useFindAndModify: false, 
+    //     useCreateIndex: true
+    // })
+    // console.log('⚡️[server]: Connected to mongodb.')
 
-app.use(logger);
-app.use(router);
+    // apply middlewares
+    app.use(cors());
+    app.use(helmet())
+    app.use(express.json());
+    app.use(express.urlencoded({ extended: true }));
 
-// mongoose.connect('mongodb://localhost/test', { useNewUrlParser: true, useUnifiedTopology: true})
-// .then(() => {
-//     console.log('⚡️[server]: Connected to mongodb.')
-//     app.listen(PORT, () => {
-//         console.log(`⚡️[server]: Server is running at http://localhost:${PORT}`);
-//     })
-// })
-// .catch((err) => {
-//     console.log(err);
-// })
+    // apply views
+    app.set('views', path.join(__dirname, 'views'));
+    app.set('view engine', 'ejs');
 
-console.log('⚡️[server]: Connected to mongodb.')
-app.listen(PORT, () => {
-    console.log(`⚡️[server]: Server is running at http://localhost:${PORT}`);
-})
+    // apply session
+    // app.set('trust proxy', 1);
+    // app.use(session({
+    //     secret: "some secrete phrase",
+    //     resave: false,
+    //     saveUninitialized: false,
+    //     cookie: { secure: false },
+    //     store: MongoStore.create({
+    //         mongoUrl: config.MONGODB_URL,
+    //         autoRemove: 'native', // default
+    //     })
+    // }))
+
+    // apply logger and router
+    app.use(logger);
+    app.use(router);
+
+    // start the server
+    app.listen(config.PORT, () => {
+        console.log(`⚡️[server]: Server is running at http://localhost:${config.PORT}`);
+    })
+}
+
+main();

@@ -1,4 +1,5 @@
 import { Response, Request, Router } from 'express';
+import config from './config';
 // import { AccountRoutes } from '../account/api/routes';
 
 const router = Router();
@@ -9,7 +10,7 @@ const router = Router();
 
 
 router.get('/', (req: Request , res: Response) => {
-    res.render('index', { site_title: 'Noxpress'});
+    res.render('index', { site_title: config.SITE_NAME});
 });
 
 export default router;
